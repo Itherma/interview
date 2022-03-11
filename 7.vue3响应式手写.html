@@ -1,0 +1,70 @@
+<body>
+  <h1 id="container"></h1>
+</body>
+<script>
+  // 用于存放所有响应式数据和effect关联关系的容器
+  const targetMap = new WeakMap();
+
+  // 当前活动的effect
+  let activeEffect;
+
+  // 设置当前effect函数
+  function effect(fn) {
+    activeEffect = fn;
+    fn();
+  }
+
+  // 收集effect函数追踪变化, 主要为了构造一个 WeakMap<object,map> => Map<key,set> => Set<effect,effect...> 这样的数据结构, 将属性和effect关联起来
+  function track(target, key) {
+    if (!activeEffect) return;
+    // 在targetMap里找当前对象的map对象,没找到就新增
+    let depsMap = targetMap.get(target);
+    if (!depsMap) {
+      targetMap.set(target, (depsMap = new Map()));
+    }
+    // 在前对象的map找访问的key对应的Set,没找到就新增
+    let deps = depsMap.get(key);
+    if (!deps) {
+      depsMap.set(key, (deps = new Set()));
+    }
+    // 将当前activeEffect添加到当前target对应的key的Set里面
+    if (!deps.has(activeEffect)) {
+      deps.add(activeEffect);
+    }
+  }
+
+  // 当属性变更时触发effect
+  function trigger(target, key) {
+    const fns = targetMap.get(target)?.get(key);
+    fns && fns.forEach((fn) => fn());
+  }
+
+  // 定义响应式数据
+  function defineReactive(data) {
+    return new Proxy(data, {
+      get(target, key, receiver) {
+        track(target, key);
+        return Reflect.get(target, key, receiver);
+      },
+      set(target, key, val, receiver) {
+        Reflect.set(target, key, val, receiver);
+        trigger(target, key);
+        return true;
+      },
+    });
+  }
+
+  const obj = defineReactive({
+    text: "Hello, world!",
+    ok: true,
+  });
+
+  effect(() => {
+    container.innerText = obj.ok ? obj.text : "Not yet";
+  });
+
+  // setInterval(() => {
+  //   obj.text = (Math.random() * 500).toFixed(1);
+  //   console.log(obj.text,'setInterval');
+  // }, 2000);
+</script>
