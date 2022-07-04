@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>渲染优化</title>
+  </head>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      display: flex;
+    }
+
+    ::-webkit-scrollbar {
+      width: 16px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: #e4e4e4;
+      border-radius: 100px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #d4aa70;
+      border-radius: 100px;
+    }
+    .g-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      /* width: 600px;
+      margin: 0 auto; */
+    }
+
+    .paragraph {
+      width: 500px;
+      font-size: 18px;
+      line-height: 1.5;
+      margin: auto;
+      margin: 20px;
+    }
+
+    .paragraph > p {
+      margin: 10px;
+    }
+
+    .paragraph {
+      /* display: none; */
+      /* content-visibility: auto;
+      contain-intrinsic-size: 374px; */
+      /* height: 320px; */
+    }
+  </style>
+  <body>
+    <div class="g-wrap"></div>
+  </body>
+  <script>
+    const content = `
+    <div class="paragraph">
+        <p>Lorem Start!</p>   
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non vitae voluptates maxime soluta, impedit doloremque atque quasi dignissimos, delectus distinctio aut commodi eaque nostrum maiores nulla! Ipsum voluptatibus alias suscipit!</p>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non vitae voluptates maxime soluta, impedit doloremque atque quasi dignissimos, delectus distinctio aut commodi eaque nostrum maiores nulla! Ipsum voluptatibus alias suscipit!</p>
+        <p>Lorem End!</p>  
+    </div> `;
+    const htmlStr = content.repeat(10000);
+    const container = document.querySelector(".g-wrap");
+    container.innerHTML = htmlStr;
+  </script>
+</html>
